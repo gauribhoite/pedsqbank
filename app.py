@@ -6,9 +6,13 @@ from flask import redirect
 from flask import request
 from flask import session
 from flask import url_for
+from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
-app.secret_key = "NOTSECUREKEY"
+app.config.from_object('config.BaseConfig')
+
+db = SQLAlchemy(app)
+from models import *
 
 
 def login_required(func):
@@ -25,7 +29,8 @@ def login_required(func):
 @app.route('/')
 @login_required
 def home():
-    return render_template("index.html")
+    questions = db.session.query(Question).all()
+    return render_template("index.html",questions=questions)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -54,4 +59,4 @@ def welcome():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run()
