@@ -28,11 +28,10 @@ class Chapter(db.Model):
     def __repr__(self):
         return '<Chapter %r>' % (self.name)
 
-    def __init__(self,name, description, level):
+    def __init__(self, name, description, level):
         self.name = name
         self.description = description
         self.level = level
-
 
 
 class Question(db.Model):
@@ -43,11 +42,26 @@ class Question(db.Model):
     solution = db.Column(db.String(255))
     pub_date = db.Column(db.DateTime)
     chapter_id = db.Column(db.Integer, db.ForeignKey('chapter.id'))
+    answers = db.relationship('Answer', backref='Question', lazy='dynamic')
 
     def __repr__(self):
-        return '<Question %r>' % (self.question)
+        return '<Question %r>' % self.question
 
     def __init__(self, question, solution, pub_date):
         self.question = question
         self.solution = solution
+        self.pub_date = pub_date
+
+
+class Answer(db.Model):
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    possible_answer = db.Column(db.String(255))
+    pub_date = db.Column(db.DateTime)
+    question_id = db.Column(db.Integer, db.ForeignKey('questions.id'))
+
+    def __repr__(self):
+        return '<Answer %r>' % self.possible_answer
+
+    def __init__(self, possible_answer, pub_date):
+        self.possible_answer = possible_answer
         self.pub_date = pub_date

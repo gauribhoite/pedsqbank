@@ -4,11 +4,15 @@
 <h1>Welcome to PedsQbank</h1>
 <br>
 <p>Click <a href="/logout">here</a> to logout.</p>
+<h3>Chapters:</h3>
+{% for chapter in chapters %}
 <h3>Questions:</h3>
 {% for question in questions %}
   <strong>Question:</strong> {{ question.question }} <br>
+      {{ question.answers }} <br>
   <strong>Solution:</strong> {{ question.solution}} <br>
   <strong>Date:</strong> {{ question.pub_date}} <br>
 <br>
+{% endfor %}
 {% endfor %}
 {% endblock %}

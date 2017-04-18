@@ -23,6 +23,7 @@ def login_required(func):
         else:
             flash("You need to log in to continue")
             return redirect(url_for("login"))
+
     return wrapper
 
 
@@ -30,7 +31,9 @@ def login_required(func):
 @login_required
 def home():
     questions = db.session.query(Question).all()
-    return render_template("index.html",questions=questions)
+    chapters = db.session.query(Chapter).all()
+    answers = db.session.query(Answer).all()
+    return render_template("index.html", questions=questions, chapters=chapters, answers=answers)
 
 
 @app.route('/login', methods=['GET', 'POST'])
