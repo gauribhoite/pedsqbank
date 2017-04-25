@@ -1,11 +1,11 @@
 from app import db
+from sqlalchemy_utils.types.choice import ChoiceType
 
 
 class Module(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(64))
     description = db.Column(db.String(255))
-    pub_date = db.Column(db.DateTime)
     chapters = db.relationship('Chapter', backref='module', lazy='dynamic')
 
     def __repr__(self):
@@ -35,33 +35,85 @@ class Chapter(db.Model):
 
 
 class Question(db.Model):
-    __tablename__ = "questions"
-
+    # __tablename__ = "questions"
+    MULTIPLE = '1'
+    BOOLEAN = '2'
+    TYPES = [
+        (MULTIPLE, 'Multiple Choice'),
+        (BOOLEAN, 'True/False')
+    ]
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     question = db.Column(db.String(255))
-    solution = db.Column(db.String(255))
-    pub_date = db.Column(db.DateTime)
     chapter_id = db.Column(db.Integer, db.ForeignKey('chapter.id'))
+    reason = db.Column(db.String(255))
+    type = db.Column(ChoiceType(TYPES))
+    solution = db.Column(db.Boolean)
     answers = db.relationship('Answer', backref='Question', lazy='dynamic')
 
     def __repr__(self):
-        return '<Question %r>' % self.question
+        return "Question"
 
-    def __init__(self, question, solution, pub_date):
+    def __init__(self, question, solution, type, chapter_id):
         self.question = question
         self.solution = solution
-        self.pub_date = pub_date
+        self.type = type
+        self.chapter_id = chapter_id
+
+    @property
+    def multiple(self):
+        return self.type == self.MULTIPLE
+
+    @property
+    def choices(self):
+        if self.multiple:
+            return self.alternatives
+
+    @property
+    def index(self):
+        return Question.find_index(self)
+
+    @classmethod
+    def find_index(cls, question):
+        indexes = [q.id for q in cls.query.filter_by(chapter_id=question.chapter_id).all()]
+        return indexes.index(question.id) + 1
+
+    def serialize(self):
+        response = {
+            'id': self.id,
+            'question': self.question,
+            'chapter_id': self.chapter_id,
+            'multiple': self.multiple,
+            'type': self.type.code
+        }
+        if self.multiple:
+            response['answers'] = []
+            for alt in self.answers:
+                alt_dict = alt.serialize()
+                del alt_dict['question_id']
+                response['answers'].append(alt_dict)
+        else:
+            response['solution'] = self.solution
+        return response
 
 
 class Answer(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    possible_answer = db.Column(db.String(255))
-    pub_date = db.Column(db.DateTime)
-    question_id = db.Column(db.Integer, db.ForeignKey('questions.id'))
+    text = db.Column(db.String(255))
+    correct = db.Column(db.Boolean)
+    question_id = db.Column(db.Integer, db.ForeignKey('question.id'))
 
     def __repr__(self):
-        return '<Answer %r>' % self.possible_answer
+        return '<Answer %r>' % self.text
 
-    def __init__(self, possible_answer, pub_date):
-        self.possible_answer = possible_answer
-        self.pub_date = pub_date
+    def __init__(self, text, correct, question_id):
+        self.text = text
+        self.correct = correct
+        self.question_id = question_id
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'text': self.text,
+            'correct': self.correct,
+            'question_id': self.question_id
+        }

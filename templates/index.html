@@ -9,9 +9,44 @@
 <h3>Questions:</h3>
 {% for question in questions %}
   <strong>Question:</strong> {{ question.question }} <br>
-      {{ question.answers }} <br>
+    <strong>Answers:</strong>
+        {% if question.multiple %}
+        <input type="hidden" name="order" value="{{ question.choices|join(',', attribute='id') }}">
+        {% for alternative in question.choices %}
+        <div class="checkbox {% if (alternative.id)|string() in request.form.getlist('answer') %}{{ 'success' if alternative.correct else 'error' }}{% endif %}">
+            <label>
+                <input type="checkbox" name="answer" value="{{ alternative.id }}">
+                {% if success is not none %}
+                    <i class="fa {{ 'fa-check' if alternative.correct else 'fa-times' }} fa-fw"></i>
+                {% endif %}
+                {{ alternative }}
+            </label>
+        </div>
+        {% endfor %}
+        {% else %}
+        {% for bool_val, val, label in [(True, "true", "Ja"), (False, "false", "Nei")] %}
+        <div class="radio {% if val == request.form.answer %}{{ 'success' if success else 'error' }}{% endif %}">
+            <label>
+                <input type="radio" name="answer" value="{{ val }}">
+                {% if success is not none %}
+                    <i class="fa {{ 'fa-check' if  question.correct == bool_val else 'fa-times' }} fa-fw"></i>
+                {% endif %}
+                {{ label }}
+            </label>
+        </div>
+        {% endfor %}
+        {% endif %}
+
+{% for answer in question.answers %}
+    <div class="checkbox">
+        <label>
+            <input type="checkbox" name="answer" value="{$ answer.id }">
+            {{ answer.text }}
+        </label>
+    </div>
+{% endfor %}
+<button type="submit">Check</button>
   <strong>Solution:</strong> {{ question.solution}} <br>
-  <strong>Date:</strong> {{ question.pub_date}} <br>
 <br>
 {% endfor %}
 {% endfor %}
