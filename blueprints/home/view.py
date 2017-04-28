@@ -1,4 +1,4 @@
-from _curses import flash
+
 from functools import wraps
 
 from flask import Blueprint
@@ -6,7 +6,7 @@ from flask import redirect
 from flask import render_template
 from flask import request
 from flask import session
-from flask import url_for
+from flask import url_for, flash
 
 from blueprints import db, questions_list
 from blueprints.models import Question, Chapter, Answer

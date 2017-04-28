@@ -117,3 +117,22 @@ class Answer(db.Model):
             'correct': self.correct,
             'question_id': self.question_id
         }
+
+
+class User(db.Model):
+    __tablename__ = 'users'
+    __mapper_args__ = {'order_by': 'id'}
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(255))
+    username = db.Column(db.String(255), unique=True)
+    password = db.Column(db.String(255))
+    registered = db.Column(db.Boolean)
+    admin = db.Column(db.Boolean)
+
+    def __init__(self):
+        self.registered = False
+        self.admin = False
+
+    def __repr__(self):
+        return self.username
