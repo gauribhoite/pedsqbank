@@ -8,46 +8,47 @@
 {% for chapter in chapters %}
 <h3>Questions:</h3>
 {% for question in questions %}
+
+
+{% if question is defined %}
+<div class="question">
   <strong>Question:</strong> {{ question.question }} <br>
-    <strong>Answers:</strong>
+    <form method="post">
         {% if question.multiple %}
-        <input type="hidden" name="order" value="{{ question.choices|join(',', attribute='id') }}">
-        {% for alternative in question.choices %}
+        <input type="hidden" name="order" value="{{ question.answers|join(',', attribute='id') }}">
+        {% for alternative in question.answers %}
         <div class="checkbox {% if (alternative.id)|string() in request.form.getlist('answer') %}{{ 'success' if alternative.correct else 'error' }}{% endif %}">
             <label>
                 <input type="checkbox" name="answer" value="{{ alternative.id }}">
                 {% if success is not none %}
                     <i class="fa {{ 'fa-check' if alternative.correct else 'fa-times' }} fa-fw"></i>
                 {% endif %}
-                {{ alternative }}
+                {{ alternative.text }}
             </label>
         </div>
         {% endfor %}
         {% else %}
-        {% for bool_val, val, label in [(True, "true", "Ja"), (False, "false", "Nei")] %}
+        {% for bool_val, val, label in [(True, "true"), (False, "false")] %}
         <div class="radio {% if val == request.form.answer %}{{ 'success' if success else 'error' }}{% endif %}">
             <label>
-                <input type="radio" name="answer" value="{{ val }}">
+                <input type="radio" name="answer" value="{{ val }}">
                 {% if success is not none %}
-                    <i class="fa {{ 'fa-check' if  question.correct == bool_val else 'fa-times' }} fa-fw"></i>
+                    <i class="fa {{ 'fa-check' if  question.correct == bool_val else 'fa-times' }} fa-fw"></i>
                 {% endif %}
-                {{ label }}
             </label>
         </div>
         {% endfor %}
         {% endif %}
-
-{% for answer in question.answers %}
-    <div class="checkbox">
-        <label>
-            <input type="checkbox" name="answer" value="{$ answer.id }">
-            {{ answer.text }}
-        </label>
+        <button type="submit">Verify</button>
+    </form>
+    {% if answered and question.reason %}
+    <div class="alert reason">
+        <b>Reason</b>:
+        {{ question.reason }}
     </div>
-{% endfor %}
-<button type="submit">Check</button>
-  <strong>Solution:</strong> {{ question.solution}} <br>
-<br>
+    {% endif %}
+</div>
+{% endif %}
 {% endfor %}
 {% endfor %}
 {% endblock %}

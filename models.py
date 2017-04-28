@@ -47,7 +47,7 @@ class Question(db.Model):
     chapter_id = db.Column(db.Integer, db.ForeignKey('chapter.id'))
     reason = db.Column(db.String(255))
     type = db.Column(ChoiceType(TYPES))
-    solution = db.Column(db.Boolean)
+    correct = db.Column(db.Boolean)
     answers = db.relationship('Answer', backref='Question', lazy='dynamic')
 
     def __repr__(self):
