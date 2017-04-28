@@ -1,35 +1,15 @@
-
-from functools import wraps
-
 from flask import Blueprint
-from flask import redirect
 from flask import render_template
 from flask import request
-from flask import session
-from flask import url_for, flash
+from flask_login import login_required
 
-from blueprints import db, questions_list
 from blueprints.models import Question, Chapter, Answer
+from extensions import db
 
 home_blueprint = Blueprint(
     'home', __name__,
     template_folder='templates'
 )
-
-
-##########################
-#### helper functions ####
-##########################
-def login_required(test):
-    @wraps(test)
-    def wrap(*args, **kwargs):
-        if 'logged_in' in session:
-            return test(*args, **kwargs)
-        else:
-            flash('You need to login first.')
-            return redirect(url_for('users.login'))
-
-    return wrap
 
 
 ################
@@ -45,7 +25,7 @@ def home():
     answers = db.session.query(Answer).all()
     if request.method == 'GET':
         return render_template("index.html", questions=questions, chapters=chapters, answers=answers)
-    questions_list.append(request.form["answer"])
+    # questions_list.append(request.form["answer"])
     return render_template("index.html", questions=questions, chapters=chapters, answers=answers)
 
 

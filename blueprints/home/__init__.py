@@ -1,0 +1,1 @@
+from blueprints.home.view import home_blueprint

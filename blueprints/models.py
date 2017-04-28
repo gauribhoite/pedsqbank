@@ -1,4 +1,6 @@
-from blueprints import db
+from flask_login import UserMixin
+
+from extensions import db
 from sqlalchemy_utils.types.choice import ChoiceType
 
 
@@ -119,7 +121,7 @@ class Answer(db.Model):
         }
 
 
-class User(db.Model):
+class User(UserMixin, db.Model):
     __tablename__ = 'users'
     __mapper_args__ = {'order_by': 'id'}
 
