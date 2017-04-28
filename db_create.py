@@ -1,5 +1,4 @@
-from app import db
-from models import *
+from blueprints.models import *
 
 # create the database and the db table
 db.create_all()

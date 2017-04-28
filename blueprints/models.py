@@ -1,4 +1,4 @@
-from app import db
+from blueprints import db
 from sqlalchemy_utils.types.choice import ChoiceType
 
 
