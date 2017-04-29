@@ -14,7 +14,8 @@ from flask_login import login_user
 from flask_login import logout_user
 
 from blueprints.models import User
-from blueprints.users.form import LoginForm
+from blueprints.users.form import LoginForm, RegisterForm
+from extensions import db
 
 users_blueprint = Blueprint(
     'users', __name__,
@@ -51,3 +52,21 @@ def logout():
     logout_user()
     flash('You were logged out.')
     return redirect(url_for('home.welcome'))
+
+
+@users_blueprint.route('/register/', methods=['GET', 'POST'])
+def register():
+    form = RegisterForm()
+    if form.validate_on_submit():
+        user = User(
+            name=form.username.data,
+            username=form.username.data,
+            email=form.email.data,
+            password=form.password.data,
+        )
+        user.registered = True
+        db.session.add(user)
+        db.session.commit()
+        login_user(user)
+        return redirect(url_for('home.home'))
+    return render_template('register.html', form=form)
