@@ -1,10 +1,12 @@
-from flask.ext.script import Manager
-from flask.ext.migrate import Migrate, MigrateCommand
+from flask_script import Manager
+from flask_migrate import Migrate, MigrateCommand
 
-from app import app, db
+from app import create_app
+from extensions import db
 
-migrate = Migrate(app, db)
+app = create_app()
 manager = Manager(app)
+migrate = Migrate(app, db)
 
 manager.add_command('db', MigrateCommand)
 

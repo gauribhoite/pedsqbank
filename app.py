@@ -1,65 +1,56 @@
-from functools import wraps
-
-from flask import Flask, render_template
-from flask import flash
-from flask import redirect
-from flask import request
-from flask import session
-from flask import url_for
-from flask_sqlalchemy import SQLAlchemy
-
-app = Flask(__name__)
-app.config.from_object('config.BaseConfig')
-
-db = SQLAlchemy(app)
-from models import *
+from flask import Flask
 
 
-def login_required(func):
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        if 'logged_in' in session:
-            return func(*args, **kwargs)
-        else:
-            flash("You need to log in to continue")
-            return redirect(url_for("login"))
-
-    return wrapper
+from extensions import db, login_manager
 
 
-@app.route('/')
-@login_required
-def home():
-    questions = db.session.query(Question).all()
-    chapters = db.session.query(Chapter).all()
-    answers = db.session.query(Answer).all()
-    return render_template("index.html", questions=questions, chapters=chapters, answers=answers)
+def create_app(settings_override=None):
+    """
+    Create a Flask application using the app factory pattern.
+
+    :param settings_override: Override settings
+    :return: Flask app
+    """
+    app = Flask(__name__)
+    app.config.from_object('config.BaseConfig')
+
+    if settings_override:
+        app.config.update(settings_override)
+
+    from blueprints.users.view import users_blueprint
+    from blueprints.home.view import home_blueprint
+
+    app.register_blueprint(users_blueprint)
+    app.register_blueprint(home_blueprint)
+    extensions(app)
+
+    from blueprints.models import User
+    login_manager.login_view = "users.login"
+
+    @login_manager.user_loader
+    def load_user(user_id):
+        return User.query.filter(User.id == int(user_id)).first()
+    return app
 
 
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    error = None
-    if request.method == 'POST':
-        if request.form['username'] != 'admin' or request.form['password'] != 'admin':
-            error = 'Invalid credentials. Please try again'
-        else:
-            session['logged_in'] = True
-            return redirect(url_for('home'))
+def extensions(app):
+    """
+    Register 0 or more extensions (mutates the app passed in).
 
-    return render_template('login.html', error=error)
-
-
-@app.route("/logout")
-@login_required
-def logout():
-    session.pop('logged_in', None)
-    return redirect(url_for('login'))
+    :param app: Flask application instance
+    :return: None
+    """
+    db.init_app(app)
+    login_manager.init_app(app)
+    return None
 
 
-@app.route('/welcome')
-def welcome():
-    return render_template('welcome.html')
 
 
+
+####################
+#### run server ####
+####################
 if __name__ == '__main__':
+    app = create_app()
     app.run()
