@@ -63,8 +63,8 @@ def register():
             username=form.username.data,
             email=form.email.data,
             password=form.password.data,
+            registered=True
         )
-        user.registered = True
         db.session.add(user)
         db.session.commit()
         login_user(user)
