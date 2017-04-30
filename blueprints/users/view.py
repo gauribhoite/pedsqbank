@@ -36,6 +36,7 @@ def login():
         if form.validate_on_submit():
             user = User.query.filter_by(username=request.form['username']).first()
             if user is not None and request.form['password'] == user.password:
+                print(user)
                 # session['logged_in'] = True
                 login_user(user)
                 flash('You were logged in.')
@@ -59,12 +60,12 @@ def register():
     form = RegisterForm()
     if form.validate_on_submit():
         user = User(
-            name=form.username.data,
             username=form.username.data,
             email=form.email.data,
             password=form.password.data,
-            registered=True
+            name=form.name.data
         )
+        user.registered=True
         db.session.add(user)
         db.session.commit()
         login_user(user)

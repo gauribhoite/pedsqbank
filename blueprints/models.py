@@ -133,14 +133,12 @@ class User(UserMixin, db.Model):
     admin = db.Column(db.Boolean)
     email = db.Column(db.String(255))
 
-    def __init__(self, name, username, email, password, registered):
+    def __init__(self, name, username, password, email):
         self.registered = False
         self.admin = False
-        self.name = name
         self.username = username
-        self.email = email
         self.password = password
-        self.registered = registered
+        self.email = email
 
     def __repr__(self):
         return self.username
