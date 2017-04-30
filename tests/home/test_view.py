@@ -12,7 +12,6 @@ class TestLogin(object):
         user = dict(username=username, password=password)
         response = client.post(url_for('users.login'), data=user,
                                follow_redirects=True)
-        print(response.data)
         assert "Welcome to PedsQbank" in str(response.data)
 
     def test_logout(self, client, db, username='admin', password='password'):
@@ -69,7 +68,6 @@ class TestRegister(object):
 
     def test_check_validation_on_password_match(self, client):
         response = client.post('/register/', data=self.register_user_data(confirm='mismatch'))
-        print(response.data)
         assert "Passwords must match." in str(response.data)
 
     def register_user_data(self, name='Testing User', username='PyTest', password='password1',

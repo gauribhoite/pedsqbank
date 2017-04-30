@@ -33,7 +33,6 @@ def client(test_app):
     :param test_app: Pytest fixture
     :return: Flask app client
     """
-    print("yielded test_app client")
     yield test_app.test_client()
 
 
@@ -47,8 +46,6 @@ def db(test_app):
     """
     _db.drop_all()
     _db.create_all()
-    print('db fixture')
-    # Create a single user because a lot of tests do not mutate this user.
     params = {
         'username': 'admin',
         'email': 'admin@local.host',
@@ -57,10 +54,6 @@ def db(test_app):
     }
 
     admin = User(**params)
-    # admin.username = 'admin'
-    # admin.email = 'admin@local.host'
-    # admin.password = 'password'
-    admin.name = 'Admin'
     admin.registered =True
 
     _db.session.add(admin)
