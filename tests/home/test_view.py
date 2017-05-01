@@ -1,3 +1,4 @@
+import pytest
 from flask import url_for
 from blueprints.models import User
 
@@ -30,18 +31,12 @@ class TestLogin(object):
         response = client.get(url_for('users.register'))
         assert response.status_code == 200
 
-    def test_invalid_login(self, client, db, username='incorrect', password='incorrect'):
-        invalid_user = dict(username=username, password=password)
-        response = client.post(url_for('users.login'), data=invalid_user, follow_redirects=True)
-        assert "Invalid Credentials. Please try again." in str(response.data)
-
-    def test_login_with_correct_username_incorrect_password(self, db, client, username='admin', password='incorrect'):
-        invalid_user = dict(username=username, password=password)
-        response = client.post(url_for('users.login'), data=invalid_user, follow_redirects=True)
-        assert "Invalid Credentials. Please try again." in str(response.data)
-
-    def test_login_with_incorrect_username_correct_password(self, client, db, username='incorrect',
-                                                            password='password'):
+    @pytest.mark.parametrize("username, password", [
+        ("incorrect","incorrect"),
+        ("admin","incorrect"),
+        ("incorrect","password")
+    ])
+    def test_invalid_login(self, client, db, username, password):
         invalid_user = dict(username=username, password=password)
         response = client.post(url_for('users.login'), data=invalid_user, follow_redirects=True)
         assert "Invalid Credentials. Please try again." in str(response.data)
