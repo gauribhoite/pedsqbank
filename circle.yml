@@ -4,10 +4,10 @@ machine:
 dependencies:
   pre:
     - pip install -r requirements.txt
-notify:
-  webhooks:
-    # A list of hook hashes, containing the URL field
-    - url: http://localhost:8080/job/Test/
+#notify:
+#  webhooks:
+#    # A list of hook hashes, containing the URL field
+#    - url: http://localhost:8080/job/Test/
 test:
   override:
     - py.test

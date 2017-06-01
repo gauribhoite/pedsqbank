@@ -1,0 +1,9 @@
+FROM python:3.6-alpine
+MAINTAINER "Gauri Bhoite" <gauri.rb27@gmail.com>
+
+RUN mkdir /pedsqbank
+WORKDIR /pedsqbank
+ADD . /pedsqbank/
+RUN pip install -r requirements.txt
+
+CMD ["python", "/pedsqbank/app.py"]

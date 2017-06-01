@@ -1,0 +1,45 @@
+version: '2'
+
+services:
+  mysql:
+    image: 'mysql:5.7.18'
+    environment:
+      - MYSQL_ALLOW_EMPTY_PASSWORD=yes
+      - MYSQL_DATABASE=pedsqbank
+    volumes:
+      - 'mysql:/var/lib/pedsqbank/data'
+    ports:
+      - '3306:3306'
+
+  redis:
+    image: 'redis:3.0-alpine'
+    command: redis-server --requirepass devpassword
+    volumes:
+      - 'redis:/var/lib/redis/data'
+    ports:
+      - '6379:6379'
+
+  pedsqbank:
+    build: .
+    command: python app.py
+    environment:
+      PYTHONUNBUFFERED: 'true'
+    volumes:
+      - '.:/pedsqbank'
+    depends_on:
+      - mysql
+      - redis
+    ports:
+      - '8000:8000'
+
+  celery:
+    build: .
+    command: celery worker -l info -A blueprints.users.tasks
+    env_file:
+      - '.env'
+    volumes:
+      - '.:/pedsqbank'
+
+volumes:
+  mysql:
+  redis:

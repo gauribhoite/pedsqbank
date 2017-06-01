@@ -14,7 +14,6 @@
 <div class="question">
   <strong>Question:</strong> {{ question.question }} <br>
     <form method="post">
-        {% if question.multiple %}
         <input type="hidden" name="order" value="{{ question.answers|join(',', attribute='id') }}">
         {% for alternative in question.answers %}
         <div class="checkbox {% if (alternative.id)|string() in request.form.getlist('answer') %}{{ 'success' if alternative.correct else 'error' }}{% endif %}">
@@ -27,18 +26,6 @@
             </label>
         </div>
         {% endfor %}
-        {% else %}
-        {% for bool_val, val, label in [(True, "true"), (False, "false")] %}
-        <div class="radio {% if val == request.form.answer %}{{ 'success' if success else 'error' }}{% endif %}">
-            <label>
-                <input type="radio" name="answer" value="{{ val }}">
-                {% if success is not none %}
-                    <i class="fa {{ 'fa-check' if  question.correct == bool_val else 'fa-times' }} fa-fw"></i>
-                {% endif %}
-            </label>
-        </div>
-        {% endfor %}
-        {% endif %}
         <button type="submit">Verify</button>
     </form>
     {% if answered and question.reason %}

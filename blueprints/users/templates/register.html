@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% import 'macros/form.html' as f with context %}
 
 {% block content %}
 
@@ -6,6 +7,16 @@
 <br>
 <form class="form-signin" role="form" method="post" action="">
   {{ form.csrf_token }}
+    <p>
+    {{ form.name(placeholder="name") }}
+    <span class="error">
+      {% if form.name.errors %}
+        {% for error in form.name.errors %}
+          {{ error }}
+        {% endfor %}
+      {% endif %}
+    </span>
+  </p>
   <p>
     {{ form.username(placeholder="username") }}
     <span class="error">
@@ -36,17 +47,6 @@
       {% endif %}
     </span>
   </p>
-  <p>
-  {{ form.confirm(placeholder="confirm") }}
-    <span class="error">
-      {% if form.confirm.errors %}
-        {% for error in form.confirm.errors %}
-          {{ error }}
-        {% endfor %}
-      {% endif %}
-    </span>
-  </p>
   <button class="btn btn-sm btn-success" type="submit">Register!</button>
 </form>
-
 {% endblock %}

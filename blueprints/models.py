@@ -38,17 +38,17 @@ class Chapter(db.Model):
 
 class Question(db.Model):
     # __tablename__ = "questions"
-    MULTIPLE = '1'
-    BOOLEAN = '2'
+    MULTIPLE = 1
+    BOOLEAN = 2
     TYPES = [
-        (MULTIPLE, 'Multiple Choice'),
-        (BOOLEAN, 'True/False')
+        (1, 'Multiple Choice'),
+        (2, 'True/False')
     ]
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     question = db.Column(db.String(255))
     chapter_id = db.Column(db.Integer, db.ForeignKey('chapter.id'))
     reason = db.Column(db.String(255))
-    type = db.Column(ChoiceType(TYPES))
+    # type = db.Column(db.Integer)
     correct = db.Column(db.Boolean)
     answers = db.relationship('Answer', backref='Question', lazy='dynamic')
 
@@ -58,17 +58,17 @@ class Question(db.Model):
     def __init__(self, question, solution, type, chapter_id):
         self.question = question
         self.solution = solution
-        self.type = type
+        # self.type = type
         self.chapter_id = chapter_id
 
-    @property
-    def multiple(self):
-        return self.type == self.MULTIPLE
-
-    @property
-    def choices(self):
-        if self.multiple:
-            return self.alternatives
+    # @property
+    # def multiple(self):
+    #     return self.type == self.MULTIPLE
+    #
+    # @property
+    # def choices(self):
+    #     if self.multiple:
+    #         return self.alternatives
 
     @property
     def index(self):
@@ -84,17 +84,17 @@ class Question(db.Model):
             'id': self.id,
             'question': self.question,
             'chapter_id': self.chapter_id,
-            'multiple': self.multiple,
-            'type': self.type.code
+            # 'multiple': self.multiple,
+            # 'type': self.type.code
         }
-        if self.multiple:
-            response['answers'] = []
-            for alt in self.answers:
-                alt_dict = alt.serialize()
-                del alt_dict['question_id']
-                response['answers'].append(alt_dict)
-        else:
-            response['solution'] = self.solution
+        # if self.multiple:
+        #     response['answers'] = []
+        #     for alt in self.answers:
+        #         alt_dict = alt.serialize()
+        #         del alt_dict['question_id']
+        #         response['answers'].append(alt_dict)
+        # else:
+        response['solution'] = self.solution
         return response
 
 
@@ -139,6 +139,7 @@ class User(UserMixin, db.Model):
         self.username = username
         self.password = password
         self.email = email
+        self.name = name
 
     def __repr__(self):
         return self.username
